@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!--
+ @license
+ Copyright 2024 Google LLC. All Rights Reserved.
+ SPDX-License-Identifier: Apache-2.0
+-->
+<html>
+
+<head>
+    <title>URL to Place ID Finder</title>
+    <link rel="stylesheet" type="text/css" href="./style.css" />
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-family: 'Roboto', sans-serif;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #1a73e8;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #1557b0;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            background: #f9f9f9;
+            display: none;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .value {
+            margin-bottom: 10px;
+            display: block;
+            word-break: break-all;
+        }
+
+        .error {
+            color: #d93025;
+            margin-top: 10px;
+        }
+
+        .nav {
+            margin-bottom: 20px;
+        }
+    </style>
+    <!-- Use the same loader as index.html -->
+    <script>(g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })
+            ({ key: "AIzaSyA6myHzS10YXdcazAFalmXvDkrYCp5cLc8", v: "weekly" });</script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="index.html">&larr; Back to Map Search</a>
+        </div>
+        <h1>URL to Place ID Finder</h1>
+        <p>Paste a full Google Maps URL below to find its Place ID.</p>
+
+        <input type="text" id="urlInput" placeholder="https://www.google.com/maps/place/..." />
+        <button onclick="findPlace()">Get Place ID</button>
+
+        <div id="error" class="error"></div>
+
+        <div id="result">
+            <span class="label">Place Name:</span>
+            <span id="placeName" class="value"></span>
+
+            <span class="label">Place ID:</span>
+            <span id="placeId" class="value" style="font-family: monospace; font-size: 1.2em;"></span>
+
+            <span class="label">Address:</span>
+            <span id="placeAddress" class="value"></span>
+        </div>
+    </div>
+
+    <script>
+        let placesService;
+
+        async function init() {
+            // Load the places library
+            const { PlacesService } = await google.maps.importLibrary("places");
+            // We need a map or a div to init PlacesService, even if we don't show the map?
+            // Actually PlacesService requires a map or HTMLDivElement (attribution container)
+            const attributionDiv = document.createElement('div');
+            placesService = new PlacesService(attributionDiv);
+        }
+
+        // Initialize API
+        init();
+
+        async function findPlace() {
+            const urlInput = document.getElementById('urlInput').value.trim();
+            const errorDiv = document.getElementById('error');
+            const resultDiv = document.getElementById('result');
+
+            errorDiv.textContent = '';
+            resultDiv.style.display = 'none';
+
+            if (!urlInput) {
+                errorDiv.textContent = 'Please enter a URL';
+                return;
+            }
+
+            // parse URL
+            let query = '';
+            try {
+                // Start simple: try to extract /place/<NAME>/
+                const regex = /\/maps\/place\/([^\/@]+)/;
+                const match = urlInput.match(regex);
+
+                if (match && match[1]) {
+                    query = decodeURIComponent(match[1].replace(/\+/g, ' '));
+                } else {
+                    // If no clear structure, maybe it's a short link or just a query string?
+                    // Let's assume the user might have pasted a name if not a URL?
+                    // Or just try specific format handling.
+                    errorDiv.textContent = 'Could not extract place name from URL. Ensure it is a full "google.com/maps/place/..." link.';
+
+                    // Fallback: Use the whole input as query?
+                    // query = urlInput;
+                    return;
+                }
+            } catch (e) {
+                errorDiv.textContent = 'Error parsing URL.';
+                return;
+            }
+
+            if (!query) {
+                errorDiv.textContent = 'Could not extract place name.';
+                return;
+            }
+
+            console.log("Searching for:", query);
+
+            const request = {
+                query: query,
+                fields: ['place_id', 'name', 'formatted_address'],
+            };
+
+            placesService.findPlaceFromQuery(request, (results, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
+                    const place = results[0];
+                    document.getElementById('placeName').textContent = place.name;
+                    document.getElementById('placeId').textContent = place.place_id;
+                    document.getElementById('placeAddress').textContent = place.formatted_address;
+                    resultDiv.style.display = 'block';
+                } else {
+                    errorDiv.textContent = 'Place not found using extracted name: "' + query + '". Status: ' + status;
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
