@@ -67,8 +67,8 @@ const CardsGrid = () => {
                     if (json && json.table && json.table.rows) {
                         const rows = json.table.rows;
 
-                        // Calculate active shop count (rows - 1 for header)
-                        const count = Math.max(0, rows.length - 1);
+                        // Calculate active shop count (rows contains only data now)
+                        const count = rows.length;
                         setShopCount(count);
 
                         // Parse Data for List
