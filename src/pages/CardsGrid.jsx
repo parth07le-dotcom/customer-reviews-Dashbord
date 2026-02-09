@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Users } from 'lucide-react';
 
 // Helper to convert Google Drive View URLs to Direct URLs
@@ -295,10 +296,10 @@ const CardsGrid = () => {
                 </div>
             </div>
 
-            {/* Image Preview Modal */}
-            {selectedImage && (
+            {/* Image Preview Modal - Portaled to Body to avoid Z-index issues with Header */}
+            {selectedImage && createPortal(
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in p-4"
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in p-4"
                     onClick={() => setSelectedImage(null)}
                 >
                     <div className="relative max-w-3xl max-h-[90vh] bg-white rounded-2xl shadow-xl overflow-hidden p-2" onClick={e => e.stopPropagation()}>
@@ -316,7 +317,8 @@ const CardsGrid = () => {
                             className="w-full h-full object-contain max-h-[85vh] rounded-lg bg-gray-50"
                         />
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );
