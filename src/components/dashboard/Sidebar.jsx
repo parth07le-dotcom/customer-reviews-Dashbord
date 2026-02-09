@@ -28,6 +28,7 @@ const Sidebar = () => {
     const menuItems = [
         { name: 'Overview', icon: HomeIcon, path: '/admin' }, // Using Home icon for "Cards" view as primary
         { name: 'User Admin', icon: AgentsIcon, path: '/admin/user-admin' },
+        { name: 'Place ID Finder', icon: ToolsIcon, path: '/admin/place-finder' },
     ];
 
     return (

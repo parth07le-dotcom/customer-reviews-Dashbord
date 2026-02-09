@@ -16,7 +16,7 @@ const AdminDashboard = () => {
 
                 {/* Scrollable Content Area */}
                 <main className="flex-1 overflow-y-auto p-8 relative z-10">
-                    <div className="w-full">
+                    <div className="w-full h-full">
                         <Outlet />
                     </div>
                 </main>

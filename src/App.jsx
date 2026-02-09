@@ -10,6 +10,7 @@ import ReviewSelection from "./pages/ReviewSelection";
 import ShopValidator from "./pages/ShopValidator";
 
 import CardsGrid from "./pages/CardsGrid";
+import PlaceIdFinder from "./pages/PlaceIdFinder";
 
 // GUARD: Protects routes from unauthenticated users
 const ProtectedRoute = ({ children, allowedRole = 'admin' }) => {
@@ -77,6 +78,7 @@ function App() {
                         <Route path="settings" element={<DummyPage title="System Settings" />} />
                         <Route path="settings" element={<DummyPage title="System Settings" />} />
                         <Route path="qrcode" element={<QrCode />} />
+                        <Route path="place-finder" element={<PlaceIdFinder />} />
                     </Route>
 
                     {/* Dynamic Shop Route */}

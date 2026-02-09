@@ -39,7 +39,7 @@ async function initMap() {
         map: map,
         collisionBehavior: google.maps.CollisionBehavior.REQUIRED_AND_HIDES_OPTIONAL,
     });
-    marker.addListener('click', () => {
+    marker.addEventListener('gmp-click', () => {
         infowindow.open(map, marker);
     });
     placeAutocomplete.addEventListener('gmp-select', async ({ placePrediction }) => {
