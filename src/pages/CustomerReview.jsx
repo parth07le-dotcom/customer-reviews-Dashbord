@@ -46,6 +46,13 @@ const CustomerReview = ({ shopName, shopLogo, mapUrl, placeId }) => {
         setImgError(false);
     }, [shopData.logo]);
 
+    // Force Title Update
+    useEffect(() => {
+        if (shopData?.name) {
+            document.title = `${shopData.name} - Submit Review`;
+        }
+    }, [shopData.name]);
+
     useEffect(() => {
         if (activePlaceId) {
             const SHEET_ID = '1UcRAbcxmDkpiaFY7SWmc--79BJRvaRG1J6omsrj-8bg';

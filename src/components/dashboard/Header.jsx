@@ -28,6 +28,17 @@ const Header = () => {
 
     const { title, subtitle } = getPageTitle(location.pathname);
 
+    // Update Browser Tab Title with Shop Name
+    React.useEffect(() => {
+        if (user?.shop_name) {
+            document.title = `${user.shop_name} - Dashboard`;
+        } else if (user?.full_name) {
+            document.title = `${user.full_name} - Dashboard`;
+        } else {
+            document.title = 'Pucho Dashboard';
+        }
+    }, [user]);
+
     return (
         <header className="sticky top-0 z-20 w-full bg-white/80 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between pl-5 py-4 pr-8">
             {/* Title & Search (Left) */}
